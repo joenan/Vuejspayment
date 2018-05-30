@@ -1,0 +1,288 @@
+<div>
+  <div class="materialbadge">
+    <v-badge color="green" >
+      <span slot="badge">!</span>
+    </v-badge>
+  </div>
+  <div class="modulename">
+    Payment Manager
+  </div>
+  <div >
+
+    <v-chip label small color="green" class="recordsbadge"><span class="whitetext">{{paymentResults.length}} Records</span></v-chip>
+
+  </div>
+  <div>
+    <!--<v-btn color="success" class="addNew">Add New</v-btn>-->
+
+
+      <div>
+        <v-dialog fullscreen v-model="paymentDialog">
+          <v-btn slot="activator" color="success" class="addNew">New Payment</v-btn>
+          <!--Popup  Flex containing all items in different cards-->
+
+          <v-flex d-flex >
+            <v-card width="700px">
+              <v-card-text>Payment Invoice Summary</v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm12 md12>
+                    <v-select
+                      :items="subscriberListItems"
+                      v-model="Paymentheaderdto.subscriberid"
+                      label="Subscriber"
+                      single-line
+                      item-text="firstname"
+                      return-object
+                      persistent-hint
+                      autocomplete
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field v-model="Paymentheaderdto.amount" label="Amount" disabled></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field @input="onDiscountTyped" v-model="Paymentheaderdto.discount" label="Discount"></v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field @input="onPaidTyped" v-model="Paymentheaderdto.paid" label="Paid"></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field v-model="Paymentheaderdto.balance" label="Balance" disabled></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs6 sm6 md6>
+
+                    <v-menu
+                      ref="datemenu"
+                      :close-on-content-click="false"
+                      v-model="datemenu"
+                      :nudge-right="40"
+                      :return-value.sync="paydate"
+                      lazy
+                      transition="scale-transition"
+                      offset-y
+
+                    >
+                      <v-text-field slot="activator" v-model="Paymentheaderdto.paydate" label="Date" prepend-icon="event" readonly></v-text-field>
+                      <v-date-picker v-model="Paymentheaderdto.paydate" @input="$refs.datemenu.save(date)"></v-date-picker>
+
+                    </v-menu>
+
+                  </v-flex>
+
+                  <v-flex xs6 sm6 md6>
+                    <v-menu
+                      ref="duedatemenu"
+                      :close-on-content-click="false"
+                      v-model="duedatemenu"
+                      :nudge-right="40"
+                      :return-value.sync="payduedate"
+                      lazy
+                      transition="scale-transition"
+                      offset-y
+
+                    >
+
+                      <v-text-field slot="activator" v-model="Paymentheaderdto.payduedate" label="Due Date" prepend-icon="event" readonly ></v-text-field>
+                      <v-date-picker v-model="Paymentheaderdto.payduedate" @input="$refs.duedatemenu.save(payduedate)"></v-date-picker>
+                    </v-menu>
+
+                  </v-flex>
+
+                  <v-flex xs6 sm6 m6>
+                    <v-text-field v-model="Paymentheaderdto.linkremarks" label="Link Remark"></v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field v-model="Paymentheaderdto.thenkyoouremarks" label="Thank you Remarks"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12>
+                    <v-text-field v-model="Paymentheaderdto.referalremarks" label="Referral Remarks"></v-text-field>
+                  </v-flex>
+
+                </v-layout>
+              </v-container>
+            </v-card>
+
+            <v-card>
+              <v-flex>
+              <v-card-text>Payment Invoice Details</v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs4 sm4 md2>
+                    <v-select
+                      :items="itemsList"
+                      v-model="Paymentdetail.itemid"
+                      label="Items"
+                      single-line
+                      item-text="description"
+                      return-object
+                      persistent-hint
+                      autocomplete
+                      @input="onItemsListSelected"
+
+
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs6 sm6 md3>
+                    <v-select
+                      :items="accountList"
+                      v-model="Paymentdetail.accountid"
+                      label="Account"
+                      single-line
+                      item-text="accountname"
+                      return-object
+                      persistent-hint
+                      autocomplete
+
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs1 sm1 md1>
+                    <v-text-field @input="onQuantityInputed" v-model="Paymentdetail.quantity" label="Quantity"></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs1 sm1 md1>
+                    <v-text-field v-model="Paymentdetail.cost" label="Rate" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs1 sm1 md1>
+                    <v-text-field v-model="Paymentdetail.amount" label="Amount" disabled></v-text-field>
+                  </v-flex>
+
+
+                  <v-flex xs6 sm4 md2>
+                    <v-btn color="success" flat @click="addToPaymentdetails">Add</v-btn>
+                  </v-flex>
+                  <v-flex xs6 sm4 md2>
+                    <v-btn color="success" flat @click="close()">Close</v-btn>
+                  </v-flex>
+
+                </v-layout>
+              </v-container>
+              </v-flex>
+              <v-flex>
+
+                <div class="paymentinvoiceinfo">
+                  <v-icon color="success">view_list</v-icon>
+                  Invoice Details
+                </div>
+                <v-data-table
+                  :headers="paymentDialogHeaders"
+                  :items="paymentdetailList"
+                  v-model="editedTable"
+                  hide-actions
+                  class="elevation-1"
+                  width="200px"
+                >
+                  <template slot="items" slot-scope="payment">
+                    <td>{{  payment.item.itemid.description }}</td>
+                    <td >{{ payment.item.quantity}}</td>
+                    <td >{{ payment.item.cost}}</td>
+                    <td >{{ payment.item.amount}}</td>
+                    <td >{{ payment.item.accountid.accountname}}</td>
+
+
+
+                    <td class="justify-center layout px-0">
+                      <v-btn icon class="mx-0" @click="changeDetailRecord(payment.item)">
+                        <v-icon color="teal">edit</v-icon>
+                      </v-btn>
+                      <v-btn icon class="mx-0" @click="removeDetailRecord(payment.item.id)">
+                        <v-icon color="pink" >delete</v-icon>
+                      </v-btn>
+                    </td>
+                  </template>
+
+                </v-data-table>
+
+              </v-flex>
+            </v-card>
+          </v-flex>
+
+          <v-card align="right">
+            <v-btn color="success" flat @click="saveAll()">Save All</v-btn>
+          </v-card>
+
+        </v-dialog>
+
+
+
+      </div>
+
+  </div>
+
+  <div class="righticons">
+      <v-btn flat icon class="righticonsbtn_settings"><v-icon color="teal darken-2">settings</v-icon></v-btn>
+      <v-btn flat icon class="righticonsbtn_refresh"><v-icon color="teal darken-2">refresh</v-icon></v-btn>
+      <v-btn flat icon class="righticonsbtn_print" @click="printReport()"><v-icon color="teal darken-2">print</v-icon></v-btn>
+  </div>
+
+  <div>
+    <div>
+
+    </div>
+    <div>
+      <template>
+        <v-card>
+          <v-card-title>
+            <div class="paymentinvoiceinfo">
+              <v-icon color="success">view_list</v-icon>
+              Payment Invoice
+            </div>
+            <v-spacer></v-spacer>
+            <div class="righticons_deleteedit">
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="openEditDialog()"><v-icon>mode_edit</v-icon></v-btn>
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="removeRecord()"><v-icon>delete_forever</v-icon></v-btn>
+            </div>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-card-title>
+
+          <template>
+            <v-data-table
+              :headers="paymentHeaders"
+              :items="paymentResults"
+              :search="search"
+              v-model="selected"
+              item-key="id"
+              select-all
+              class="elevation-1"
+              :total-items="pagination.totalItems"
+              :pagination.sync="pagination"
+            >
+              <template slot="items" slot-scope="props">
+                <td>
+                  <v-checkbox
+                    v-model="props.selected"
+                    primary
+                    hide-details
+
+                  ></v-checkbox>
+                </td>
+                <td>{{  props.item.subscribername }}</td>
+                <td >{{ props.item.duedate}}</td>
+                <td >{{ props.item.invoiceno}}</td>
+                <td >{{ props.item.amount}}</td>
+                <td >{{ props.item.discount}}</td>
+                <td >{{ props.item.paid}}</td>
+                <td >{{ props.item.amountdue}}</td>
+              </template>
+
+
+            </v-data-table>
+          </template>
+
+
+        </v-card>
+      </template>
+    </div>
+
+  </div>
+
+</div>

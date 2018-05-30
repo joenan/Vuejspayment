@@ -1,0 +1,51 @@
+.whitetext {
+    color: white;
+}
+
+.exportbtn {
+    height: 26px;
+}
+
+.topDivider {
+    margin-top: -7%;
+}
+
+.materialbadge {
+    margin-top: -14px;
+}
+
+.modulename {
+    margin-left: 30px;
+    margin-top: -16px;
+    padding: 0;
+}
+
+.addNew {
+    height: 26px;
+    margin-top: -74px;
+    margin-left: 450px;
+}
+
+.recordsbadge {
+    margin-left: 300px;
+    margin-top: -41px;
+    height: 18px;
+}
+
+.righticons {
+    margin-top: -65px;
+    float: right;
+}
+
+.reportTop {
+    float: right;
+    margin-top: -30px;
+}
+
+.reporticon {
+    height: 26px;
+}
+
+.paymentinvoiceinfo {
+    margin-top: -20px;
+}

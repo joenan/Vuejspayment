@@ -1,0 +1,203 @@
+<div>
+  <div class="materialbadge">
+    <v-badge color="green" >
+      <span slot="badge">!</span>
+    </v-badge>
+  </div>
+  <div class="modulename">
+    Request Manager
+  </div>
+  <div>
+
+    <v-chip label small color="green" class="recordsbadge"><span class="whitetext">{{requestDetailResults.length}} Records</span></v-chip>
+
+  </div>
+  <div>
+    <!--<v-btn color="success" class="addNew">Add New</v-btn>-->
+
+
+    <div>
+      <v-dialog fullscreen v-model="newRequestDialog">
+        <v-btn slot="activator" color="success" class="addNew">New Request</v-btn>
+        <!--Popup  Flex containing all items in different cards-->
+
+        <v-flex d-flex >
+          <v-card width="30%">
+            <v-card-text>Request Description</v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+
+                <v-flex xs12 sm12 md12>
+                  <v-text-field v-model="Requestmaindto.remarks" label="Description"></v-text-field>
+                </v-flex>
+
+              </v-layout>
+            </v-container>
+          </v-card>
+
+          <v-card>
+            <v-flex>
+              <v-card-text>Request Item Details</v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs4 sm4 md2>
+                    <v-select
+                      :items="detailItemList"
+                      v-model="Requestdetail.itemid"
+                      label="Items"
+                      single-line
+                      item-text="description"
+                      return-object
+                      persistent-hint
+                      autocomplete
+                      @input="onItemsListSelected"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs4 sm4 md2>
+                    <v-text-field @input="onQuantityInputed" v-model="Requestdetail.qtyrequest" label="Quantity"></v-text-field>
+                  </v-flex>
+                  <v-flex xs4 sm4 md2>
+                    <v-text-field v-model="rate" label="Rate" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs4 sm4 md2>
+                    <v-text-field v-model="Requestdetail.amountrequest" label="Amount" disabled></v-text-field>
+                  </v-flex>
+
+
+                  <v-flex>
+                    <v-btn color="success" flat @click="addToRequestdetails">Add</v-btn>
+                    <v-btn color="success" flat @click="close()">Close</v-btn>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-flex>
+            <v-flex>
+
+              <div class="paymentinvoiceinfo">
+                <v-icon color="success">view_list</v-icon>
+                Payment Details
+              </div>
+              <v-data-table
+                :headers="dialogTable"
+                :items="RequestdetaildtoList"
+                v-model="editedTable"
+                hide-actions
+                class="elevation-1"
+              >
+                <template slot="items" slot-scope="main">
+                  <td>{{ main.item.itemid.description}}</td>
+                  <td >{{ main.item.qtyrequest}}</td>
+                  <td>{{ main.item.datecreated}}</td>
+                  <td>{{ Requestmaindto.status}}</td>
+
+                  <td class="justify-center layout px-0">
+                    <v-btn icon class="mx-0" @click="changeDetailRecord(main.item)">
+                      <v-icon color="teal">edit</v-icon>
+                    </v-btn>
+                    <v-btn icon class="mx-0" @click="removeDetailRecord(main.item.id)">
+                      <v-icon color="pink">delete</v-icon>
+                    </v-btn>
+                  </td>
+                </template>
+
+              </v-data-table>
+
+            </v-flex>
+          </v-card>
+        </v-flex>
+
+        <v-card align="right">
+          <v-btn color="success" flat @click="saveAll()">Save All</v-btn>
+        </v-card>
+
+      </v-dialog>
+
+    </div>
+
+  </div>
+
+  <div class="righticons">
+    <v-btn flat icon class="righticonsbtn_settings"><v-icon color="teal darken-2">settings</v-icon></v-btn>
+    <v-btn flat icon class="righticonsbtn_refresh"><v-icon color="teal darken-2">refresh</v-icon></v-btn>
+    <v-btn flat icon class="righticonsbtn_print" @click="printReport()"><v-icon color="teal darken-2">print</v-icon></v-btn>
+  </div>
+
+  <div>
+    <div>
+
+    </div>
+    <div>
+      <template>
+        <v-card>
+          <v-card-title>
+            <div class="paymentinvoiceinfo">
+              <v-icon color="success">view_list</v-icon>
+              Requested Items
+            </div>
+            <v-spacer></v-spacer>
+            <div class="righticons_deleteedit">
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="closeRequest()"><v-icon>cancel</v-icon></v-btn>
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="duplicateRequest()"><v-icon>control_point_duplicate</v-icon></v-btn>
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="openEditDialog()"><v-icon>mode_edit</v-icon></v-btn>
+              <v-btn flat icon color="green" v-if="selected.length>=1" @click="removeRecord()"><v-icon>delete_forever</v-icon></v-btn>
+            </div>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-card-title>
+
+          <template>
+            <v-data-table
+              :headers="headers"
+              :items="requestDetailResults"
+              :search="search"
+              v-model="selected"
+              item-key="id"
+              select-all
+              class="elevation-1"
+            >
+              <template slot="headerCell" slot-scope="main">
+                <v-tooltip bottom>
+        <span slot="activator">
+          {{ main.header.text }}
+        </span>
+                  <span>
+          {{ main.header.text }}
+        </span>
+                </v-tooltip>
+              </template>
+              <template slot="items" slot-scope="main">
+                <td>
+                  <v-checkbox
+                    v-model="main.selected"
+                    primary
+                    hide-details
+                  ></v-checkbox>
+                </td>
+                <td class="text-xs-justify">{{ main.item.remarks }}</td>
+                <!--<td class="text-xs-center">{{ main.item.requestststatus }}-->
+                <td class="text-xs-left">
+                <v-chip v-if="main.item.requestststatus==='Rejected'" align="right" color="yellow" text-color="black">{{main.item.requestststatus}}</v-chip>
+               <v-chip v-if="main.item.requestststatus==='Cancel'" align="right" color="red" text-color="black">{{main.item.requestststatus}}</v-chip>
+                <v-chip v-if="main.item.requestststatus==='Approved'" align="right" color="blue" text-color="white">{{main.item.requestststatus}}</v-chip>
+                <v-chip v-if="main.item.requestststatus==='Closed'" align="right" color="violet" text-color="black">{{main.item.requestststatus}}</v-chip>
+                <v-chip v-if="main.item.requestststatus==='New'" align="right" color="green" text-color="white">{{main.item.requestststatus}}</v-chip>
+                <v-chip v-if="main.item.requestststatus==='Pending'" align="right" color="gold" text-color="black">{{main.item.requestststatus}}</v-chip>
+
+               </td>
+
+              </template>
+            </v-data-table>
+          </template>
+
+        </v-card>
+      </template>
+    </div>
+
+  </div>
+
+</div>

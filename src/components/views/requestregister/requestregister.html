@@ -1,0 +1,68 @@
+<div>
+  <div class="materialbadge">
+    <v-badge color="green" >
+      <span slot="badge">!</span>
+    </v-badge>
+  </div>
+  <div class="modulename">
+    Request Register
+  </div>
+  <div >
+    <v-chip label small color="green" class="recordsbadge"><span class="whitetext">{{results.length}} Records</span></v-chip>
+  </div>
+  <div>
+    <!--<v-btn color="success" class="addNew">Add New</v-btn>-->
+  </div>
+
+  <div class="righticons">
+    <v-icon color="teal darken-2">settings</v-icon>
+
+    <v-icon color="teal darken-2">refresh</v-icon>
+
+    <v-icon color="teal darken-2">print</v-icon>
+
+  </div>
+
+  <!--<div class="paymentinvoiceinfo">-->
+    <!--<v-icon>view_list</v-icon>-->
+   <!--Request Register-->
+
+  <!--</div>-->
+
+  <div>
+    <div>
+
+    </div>
+
+
+        <div v-for="request in results" class="cardrow">
+          <div class="cardcolumn1">
+            <img src="@/images/pics.jpg" width="50px" height="50px">
+          </div>
+          <div class="cardcolumn2">
+            <div class="text-xs-left">
+              <v-chip>{{request.issuebyname}} @ {{request.requestedbyid.username}}</v-chip>
+            </div>
+
+            {{request.remarks}}
+          </div>
+
+          <div class="cardcolumn3">
+
+            <v-chip v-if="request.requestststatus==='Rejected'" align="right" color="yellow" text-color="black">{{request.requestststatus}}</v-chip>
+            <v-chip v-if="request.requestststatus==='Cancel'" align="right" color="red" text-color="black">{{request.requestststatus}}</v-chip>
+            <v-chip v-if="request.requestststatus==='Approved'" align="right" color="blue" text-color="white">{{request.requestststatus}}</v-chip>
+            <v-chip v-if="request.requestststatus==='Closed'" align="right" color="violet" text-color="white">{{request.requestststatus}}</v-chip>
+            <v-chip v-if="request.requestststatus==='New'" align="right" color="green" text-color="white">{{request.requestststatus}}</v-chip>
+            <v-chip v-if="request.requestststatus==='Pending'" align="right" color="gold" text-color="black">{{request.requestststatus}}</v-chip>
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+  </div>
+
+</div>
